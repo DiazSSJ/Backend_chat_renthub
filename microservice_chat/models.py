@@ -14,7 +14,7 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
             id_origin=id_origin,
             name=name,
-            last_name=last_name,
+            last_name= last_name,
         )
 
         user.set_unusable_password()  # Esto establece una contraseña no utilizable
@@ -30,6 +30,7 @@ class User(AbstractUser):
     id_origin = models.IntegerField(unique=True,null=True)
     name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
+    username = models.CharField(max_length=30, unique=False)
 
     groups = models.ManyToManyField(Group, related_name="users")
     user_permissions = models.ManyToManyField(Permission, related_name="users")
@@ -41,6 +42,9 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.username
 
 
 class Profile(models.Model):
@@ -95,4 +99,5 @@ class ChatMessage(models.Model):
     def reciever_profile(self):
         reciever_profile = Profile.objects.get(user=self.reciever)
         return reciever_profile
+
 
