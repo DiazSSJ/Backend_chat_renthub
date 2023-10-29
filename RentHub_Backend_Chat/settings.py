@@ -92,6 +92,8 @@ DATABASES = {
 database_url = os.environ.get("DATABASE_URL")
 DATABASES["default"] =  dj_database_url.parse(database_url)
 
+#postgres://backend_chat_db_user:QpT4cE8mx8shhwmLlR8NLZF93ynRxkaa@dpg-ckuov9ub0mos73cjl0fg-a.ohio-postgres.render.com/backend_chat_db
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
