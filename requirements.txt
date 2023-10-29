@@ -1,0 +1,9 @@
+Django==3.2.19
+django-cors-headers==3.14.0
+djangorestframework==3.14.0
+Pillow
+dj-database-url
+gunicorn
+requests
+psycopg2-binary
+coreapi
