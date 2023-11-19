@@ -23,13 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = os.environ.get("SECRET_KEY")
+#SECRET_KEY = 'AKKDVkdsmvlsvmrebve5b5dv1svws'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+#DEBUG = True
 
 #ALLOWED_HOSTS = ['*']
-
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -91,6 +94,8 @@ DATABASES = {
 
 database_url = os.environ.get("DATABASE_URL")
 DATABASES["default"] =  dj_database_url.parse(database_url)
+
+#DATABASES["default"] =  dj_database_url.parse("postgres://backend_chat_db_user:QpT4cE8mx8shhwmLlR8NLZF93ynRxkaa@dpg-ckuov9ub0mos73cjl0fg-a.ohio-postgres.render.com/backend_chat_db")
 
 #postgres://backend_chat_db_user:QpT4cE8mx8shhwmLlR8NLZF93ynRxkaa@dpg-ckuov9ub0mos73cjl0fg-a.ohio-postgres.render.com/backend_chat_db
 

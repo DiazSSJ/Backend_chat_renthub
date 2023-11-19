@@ -1,8 +1,10 @@
 from django.shortcuts import render
+from django.db.models import OuterRef, Subquery     
+from django.db.models import Q, Max, F, Min
 from rest_framework import generics
 from microservice_chat.models import User, Profile, ChatMessage
 from rest_framework.permissions import AllowAny
-from microservice_chat.serializer import RegisterSerializer
+from microservice_chat.serializer import RegisterSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
 import requests
@@ -13,6 +15,60 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+
+class MyInbox(generics.ListAPIView):
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+
+        # Obtener el usuario actual
+        user = User.objects.filter(id_origin=user_id).first()
+
+        if user:
+            # Obtener los últimos mensajes para cada conversación
+            messages = ChatMessage.objects.filter(
+                Q(sender=user) | Q(receiver=user)
+            ).order_by('-id').values('sender', 'receiver','id').annotate(last_message= Max('id'))
+
+            # Obtener los mensajes correspondientes a esas fechas
+            chat_ids = set()
+            unique_messages = []
+            
+            for message in messages:
+                chat_id = tuple(sorted([message['sender'], message['receiver']]))
+                
+                if chat_id not in chat_ids:
+                    chat_ids.add(chat_id)
+                    unique_messages.append(message['last_message'])
+            
+            # Obtener los mensajes finales
+            messages = ChatMessage.objects.filter(id__in=unique_messages).order_by("-id")
+
+            return messages
+
+        return ChatMessage.objects.none()
+    
+class GetMessages(generics.ListAPIView):
+    serializer_class = MessageSerializer
+    
+    def get_queryset(self):
+        sender_id = self.kwargs['sender_id']
+        reciever_id = self.kwargs['reciever_id']
+
+        senderUser = User.objects.filter(id_origin = sender_id).first()
+        recieverUser = User.objects.filter(id_origin = reciever_id).first()
+
+        # Verifica si los usuarios existen antes de buscar mensajes
+        if senderUser and recieverUser:
+            messages = ChatMessage.objects.filter(
+                sender__in=[senderUser.id, recieverUser.id],
+                receiver__in=[senderUser.id, recieverUser.id]
+            )
+            return messages
+        else:
+            # Puedes manejar el caso donde uno o ambos usuarios no existen
+            return ChatMessage.objects.none()
 
 
 class SendMessages(generics.CreateAPIView):

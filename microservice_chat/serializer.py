@@ -48,7 +48,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatMessage
-        fields = ['id','sender', 'reciever', 'reciever_profile', 'sender_profile' ,'message', 'is_read', 'date']
+        fields = ['id','sender', 'receiver', 'reciever_profile', 'sender_profile' ,'message', 'is_read', 'date']
     
     def __init__(self, *args, **kwargs):
         super(MessageSerializer, self).__init__(*args, **kwargs)

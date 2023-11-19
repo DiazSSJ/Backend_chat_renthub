@@ -89,6 +89,7 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"{self.sender} - {self.reciever}"
 
+    """
     @property
     def sender_profile(self):
         sender_profile = Profile.objects.get(user=self.sender)
@@ -97,7 +98,7 @@ class ChatMessage(models.Model):
     
     @property
     def reciever_profile(self):
-        reciever_profile = Profile.objects.get(user=self.reciever)
+        reciever_profile = Profile.objects.get(user=self.receiver)
         return reciever_profile
-
+    """
 
