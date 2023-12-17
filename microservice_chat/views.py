@@ -83,6 +83,7 @@ class MyInbox(generics.ListAPIView):
             for menssage in messages:
                 print(menssage)
                 data = {
+                    'id':menssage.id,
                     'texto': menssage.message,
                     'date': menssage.date,
                     'is_read':menssage.is_read,
@@ -107,10 +108,10 @@ class MyInbox(generics.ListAPIView):
 class filterMessages(generics.ListAPIView):
     serializer_class = MessageSerializer
 
-    def get_queryset(self):
+    def post(self, request):
   
-        user_id = self.request.data.get('user_id')
-        search_text = self.request.data.get('filter') 
+        user_id = request.data.get('user_id')
+        search_text = request.data.get('filter') 
 
         # Obtener el usuario actual
         user = User.objects.filter(id_origin=user_id).first()
@@ -138,11 +139,32 @@ class filterMessages(generics.ListAPIView):
             # Obtener los mensajes finales
             messages = ChatMessage.objects.filter(Q(id__in=unique_messages), Q(sender__in=filter_id)| Q(receiver__in=filter_id)).order_by("-id")
 
+            res = []
+
+            for menssage in messages:
+                print(menssage)
+                data = {
+                    'id':menssage.id,
+                    'texto': menssage.message,
+                    'date': menssage.date,
+                    'is_read':menssage.is_read,
+
+                    'id_sender': menssage.sender.id,
+                    'name_sender': menssage.sender.name,
+                    'last_name_sender': menssage.sender.last_name,
+
+                    'id_receiver': menssage.receiver.id,
+                    'name_receiver': menssage.receiver.name,
+                    'last_name_receiver': menssage.receiver.last_name,
+                }
+                
+                res.append(data)
 
 
-            return messages
+            return Response( {'mensajes': res}, status=status.HTTP_200_OK)
 
-        return ChatMessage.objects.none()
+
+        return Response( {'mensajes': []}, status=status.HTTP_404_NOT_FOUND)
     
 
 class GetMessages(generics.ListAPIView):
