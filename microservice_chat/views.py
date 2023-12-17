@@ -88,11 +88,11 @@ class MyInbox(generics.ListAPIView):
                     'date': menssage.date,
                     'is_read':menssage.is_read,
 
-                    'id_sender': menssage.sender.id,
+                    'id_sender': menssage.sender.id_origin,
                     'name_sender': menssage.sender.name,
                     'last_name_sender': menssage.sender.last_name,
 
-                    'id_receiver': menssage.receiver.id,
+                    'id_receiver': menssage.receiver.id_origin,
                     'name_receiver': menssage.receiver.name,
                     'last_name_receiver': menssage.receiver.last_name,
                 }
@@ -149,11 +149,11 @@ class filterMessages(generics.ListAPIView):
                     'date': menssage.date,
                     'is_read':menssage.is_read,
 
-                    'id_sender': menssage.sender.id,
+                    'id_sender': menssage.sender.id_origin,
                     'name_sender': menssage.sender.name,
                     'last_name_sender': menssage.sender.last_name,
 
-                    'id_receiver': menssage.receiver.id,
+                    'id_receiver': menssage.receiver.id_origin,
                     'name_receiver': menssage.receiver.name,
                     'last_name_receiver': menssage.receiver.last_name,
                 }
