@@ -49,7 +49,7 @@ class DeleteMessages(generics.DestroyAPIView):
 
 class MyInbox(generics.ListAPIView):
     serializer_class = MessageSerializer
-
+    permission_classes = (AllowAny,)
     def get_queryset(self):
         user_id = self.kwargs['user_id']
 
