@@ -35,7 +35,14 @@ DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
-CORS_ALLOW_ALL_ORIGINS = True
+e
+CORS_ALLOWED_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Agrega aquí tus dominios permitidos
+]
+
 
 
 # Application definition
