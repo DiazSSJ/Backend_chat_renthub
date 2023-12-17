@@ -50,8 +50,10 @@ class DeleteMessages(generics.DestroyAPIView):
 class MyInbox(generics.ListAPIView):
     serializer_class = MessageSerializer
     permission_classes = (AllowAny,)
-    def get_queryset(self):
-        user_id = self.kwargs['user_id']
+
+    def post(self, request):
+        user_id = request.data.get('user_id')
+        #user_id = self.kwargs['user_id']
 
         # Obtener el usuario actual
         user = User.objects.filter(id_origin=user_id).first()
@@ -76,9 +78,9 @@ class MyInbox(generics.ListAPIView):
             # Obtener los mensajes finales
             messages = ChatMessage.objects.filter(id__in=unique_messages).order_by("-id")
 
-            return messages
+            return Response( {'mensajes': messages}, status=status.HTTP_200_OK)
 
-        return ChatMessage.objects.none()
+        return Response( {'mensajes': []}, status=status.HTTP_404_NOT_FOUND)
     
 
 class filterMessages(generics.ListAPIView):
