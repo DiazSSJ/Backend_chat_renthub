@@ -78,7 +78,28 @@ class MyInbox(generics.ListAPIView):
             # Obtener los mensajes finales
             messages = ChatMessage.objects.filter(id__in=unique_messages).order_by("-id")
 
-            return Response( {'mensajes': messages}, status=status.HTTP_200_OK)
+            res = []
+
+            for menssage in messages:
+                print(menssage)
+                data = {
+                    'texto': menssage.message,
+                    'date': menssage.date,
+                    'is_read':menssage.is_read,
+
+                    'id_sender': menssage.sender.id,
+                    'name_sender': menssage.sender.name,
+                    'last_name_sender': menssage.sender.last_name,
+
+                    'id_receiver': menssage.receiver.id,
+                    'name_receiver': menssage.receiver.name,
+                    'last_name_receiver': menssage.receiver.last_name,
+                }
+                
+                res.append(data)
+
+
+            return Response( {'mensajes': res}, status=status.HTTP_200_OK)
 
         return Response( {'mensajes': []}, status=status.HTTP_404_NOT_FOUND)
     

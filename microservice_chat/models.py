@@ -86,9 +86,7 @@ class ChatMessage(models.Model):
         ordering = ['date']
         verbose_name_plural = "Message"
 
-    def __str__(self):
-        return f"{self.sender} - {self.reciever}"
-
+    
     """
     @property
     def sender_profile(self):
