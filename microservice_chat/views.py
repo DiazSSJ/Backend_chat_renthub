@@ -16,6 +16,37 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
+
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework import status
+
+class DeleteMessages(generics.DestroyAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = (AllowAny,)
+    
+    def post(self, request, *args, **kwargs):
+        sender_id = self.kwargs['sender_id']
+        receiver_id = self.kwargs['reciever_id']
+
+        sender_user = User.objects.filter(id_origin=sender_id).first()
+        receiver_user = User.objects.filter(id_origin=receiver_id).first()
+
+        # Verifica si los usuarios existen antes de borrar mensajes
+        if sender_user and receiver_user:
+            messages_to_delete = ChatMessage.objects.filter(
+                sender__in=[sender_user.id, receiver_user.id],
+                receiver__in=[sender_user.id, receiver_user.id]
+            )
+
+            # Borra los mensajes encontrados
+            messages_to_delete.delete()
+
+            return Response({"message": "Mensajes eliminados correctamente"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            # Puedes manejar el caso donde uno o ambos usuarios no existen
+            return Response({"error": "Uno o ambos usuarios no existen"}, status=status.HTTP_404_NOT_FOUND)
+
 class MyInbox(generics.ListAPIView):
     serializer_class = MessageSerializer
 
@@ -49,6 +80,48 @@ class MyInbox(generics.ListAPIView):
 
         return ChatMessage.objects.none()
     
+
+class filterMessages(generics.ListAPIView):
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+  
+        user_id = self.request.data.get('user_id')
+        search_text = self.request.data.get('filter') 
+
+        # Obtener el usuario actual
+        user = User.objects.filter(id_origin=user_id).first()
+
+        if user:
+            # Obtener los últimos mensajes para cada conversación
+            messages = ChatMessage.objects.filter(
+                Q(sender=user) | Q(receiver=user)
+            ).order_by('-id').values('sender', 'receiver','id').annotate(last_message= Max('id'))
+
+            # Obtener los mensajes correspondientes a esas fechas
+            chat_ids = set()
+            unique_messages = []
+            
+            for message in messages:
+                chat_id = tuple(sorted([message['sender'], message['receiver']]))
+                
+                if chat_id not in chat_ids:
+                    chat_ids.add(chat_id)
+                    unique_messages.append(message['last_message'])
+
+            filter_id = User.objects.filter(~Q(id_origin=user_id), Q(name__icontains=search_text) ) 
+            
+            
+            # Obtener los mensajes finales
+            messages = ChatMessage.objects.filter(Q(id__in=unique_messages), Q(sender__in=filter_id)| Q(receiver__in=filter_id)).order_by("-id")
+
+
+
+            return messages
+
+        return ChatMessage.objects.none()
+    
+
 class GetMessages(generics.ListAPIView):
     serializer_class = MessageSerializer
     
@@ -89,6 +162,7 @@ class SendMessages(generics.CreateAPIView):
         id_receiver = request.data.get('receiver')
 
         message = request.data.get('message')
+
         
         ##Si user no esta creado
         if not User.objects.filter(id_origin = id_user).exists():
@@ -121,7 +195,8 @@ class SendMessages(generics.CreateAPIView):
             user = user,
             sender = sender, 
             receiver = receiver,
-            message = message
+            message = message,
+        
         )
 
         object_message.save()
@@ -132,6 +207,9 @@ class SendMessages(generics.CreateAPIView):
         else: 
             #Algo salio mal al crear el objeto 
             return Response({'message': 'Error al crear el mensaje.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
 
 #para probar
 class get_id_receiver(generics.CreateAPIView):
