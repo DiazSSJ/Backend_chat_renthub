@@ -36,13 +36,6 @@ ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 
-CORS_ALLOWED_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-
-CORS_ALLOW_ORIGINS = [
-    'http://localhost:5173',  # Agrega aquí tus dominios permitidos
-]
-
 
 
 # Application definition
@@ -139,6 +132,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+CORS_ALLOWED_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*',]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # Agrega aquí tus dominios permitidos
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
