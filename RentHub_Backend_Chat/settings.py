@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'microservice_chat',
-    'rest_framework'
+    'rest_framework',
+    'elasticapm.contrib.django'
 ]
 
 MIDDLEWARE = [
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'elasticapm.contrib.django.middleware.TracingMiddleware'
 ]
 
 ROOT_URLCONF = "RentHub_Backend_Chat.urls"
@@ -155,5 +157,59 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+ELASTIC_APM = {
+  'SERVICE_NAME': 'renthub_chat_backend',
 
+  'SECRET_TOKEN': 'BgqkrxPiNnk6MmnOkl',
 
+  'SERVER_URL': 'https://17753c254e824399b755a1a7f8dd9573.apm.us-central1.gcp.cloud.es.io:443',
+
+  'ENVIRONMENT': 'chat-environment',
+
+  'DEBUG': True,
+
+  'ELASTIC_APM_USE_STRUCTLOG' : True
+}
+
+formatstring = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+formatstring = formatstring + " | elasticapm " \
+                              "transaction.id=%(elasticapm_transaction_id)s " \
+                              "trace.id=%(elasticapm_trace_id)s " \
+                              "span.id=%(elasticapm_span_id)s"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s - %(asctime)s - %(module)s - %(message)s - %(levelname)s'
+        },
+        'elastic': {
+            'format': formatstring
+        }
+    },
+    'handlers': {
+        'elasticapm': {
+            'level': 'INFO',
+            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+            'formatter': 'verbose'
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        "django": {
+            "handlers": ["console", "elasticapm"],
+            "level": "INFO",
+        },
+        # Log errors from the Elastic APM module to the console (recommended)
+        'elasticapm.errors': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}

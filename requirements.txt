@@ -7,3 +7,4 @@ gunicorn
 requests
 psycopg2-binary
 coreapi
+elastic-apm
